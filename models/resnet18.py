@@ -1,3 +1,4 @@
+# Sohan model
 from torchvision.models import resnet18
 from torch import nn
 
