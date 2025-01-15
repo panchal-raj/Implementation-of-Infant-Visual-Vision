@@ -9,7 +9,7 @@ from datasets import load_dataset
 # Custom imports
 from src.dataloader import create_no_curriculum_dataloader
 from models.customModel import ImprovedVisionNet
-from models.customResnet import CustomResNet
+from InfantVisualPerception.models.RajcustomResnet import CustomResNet
 from models.resnet import get_resnet18
 from config import DEVICE, BATCH_SIZE, EPOCHS, LEARNING_RATE, NUM_CLASSES
 
