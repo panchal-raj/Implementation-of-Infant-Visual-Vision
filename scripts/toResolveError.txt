@@ -1,0 +1,2 @@
+set PYTHONPATH=C:\Users\rajpa\Desktop\WS25\Task3_Sohan
+python InfantVisualPerception/scripts/compare_no_transform_rdm.py
