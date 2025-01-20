@@ -4,20 +4,16 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from torchvision.transforms import Compose, Resize, ToTensor
-from InfantVisualPerception.models.FabianModel import get_model
+from models.FabianModel import get_model
 from scipy.spatial.distance import pdist, squareform
 from datasets import load_dataset
 import random
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
+from config import MODEL_PATHS
 
 # Paths to the models
-MODEL_PATHS = {
-    "visual_acuity": "InfantVisualPerception/weights/FabianResNet/resnet18_tinyimagenet_acuity.pth",
-    "contrast_adjust": "InfantVisualPerception/weights/FabianResNet/resnet18_tinyimagenet_contrast.pth",
-    "both_transforms": "InfantVisualPerception/weights/FabianResNet/resnet18_tinyimagenet_both.pth",
-    "no_transformation": "InfantVisualPerception/weights/FabianResNet/resnet18_tinyimagenet_default.pth"
-}
+MODEL_PATHS = MODEL_PATHS #refer config.py for path files 
 
 # Load Tiny ImageNet validation set
 def load_tiny_imagenet_data(split="valid"):
@@ -45,10 +41,13 @@ def sample_random_images(data, num_samples=10):
 # Transformation pipeline for Tiny ImageNet images
 def no_transform():
     """
-    Transformation pipeline for Tiny ImageNet images.
-    Resizes images to 64x64 and converts them to tensors.
+    Ensure all images are resized to (64, 64) and converted to 3-channel RGB.
     """
-    return Compose([Resize((64, 64)), ToTensor()])
+    return Compose([
+        Resize((64, 64)), 
+        lambda img: img.convert("RGB"),  # Ensure RGB mode (3 channels)
+        ToTensor()
+    ])
 
 # Load the model from a given path
 def load_model(model_path, num_classes=200):
@@ -110,18 +109,20 @@ def add_images_to_axes(ax, images, positions, axis="x"):
         images (list): List of images as PIL or numpy arrays.
         positions (list): Positions (ticks) where images should appear.
         axis (str): Whether to add images to the "x" or "y" axis.
-        size (float): The relative size of the thumbnails.
     """
-    num_images = len(images)  # Total number of images
-    size = 1.0 / num_images  # Size relative to the number of images (RDM cells)
-    
     for pos, img in zip(positions, images):
-        imagebox = OffsetImage(img, zoom=size)
+        img_array = np.array(img)  # Ensure images are NumPy arrays
+        imagebox = OffsetImage(img_array, zoom=0.65)  # Adjust zoom if necessary
+
         if axis == "x":
-            ab = AnnotationBbox(imagebox, (pos, -0.5), frameon=False, box_alignment=(0.5, 0))
+            ab = AnnotationBbox(imagebox, (pos, -0.5), frameon=False,
+                                box_alignment=(0.5, 1), xycoords="data")  # Adjust y position
         else:
-            ab = AnnotationBbox(imagebox, (-0.5, pos), frameon=False, box_alignment=(0, 0.5))
+            ab = AnnotationBbox(imagebox, (-0.5, pos), frameon=False,
+                                box_alignment=(1, 0.5), xycoords="data")  # Adjust x position
+
         ax.add_artist(ab)
+
 
 # Save the RDM as a heatmap image
 def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
@@ -134,12 +135,12 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
         model_name (str): The name of the model.
         class_images (list, optional): List of images (PIL or numpy arrays) for the axes.
     """
-    plt.figure(figsize=(12, 10))
-    ax = plt.gca()
+    num_images = rdm.shape[0]  # Number of images
+    fig, ax = plt.subplots(figsize=(10, 10))  # Adjust figure size for clarity
 
-    #plot the heatmap
-    plt.imshow(rdm, cmap="viridis")
-    plt.colorbar(label="Correlation Distance")
+    # Plot the heatmap
+    cax = ax.imshow(rdm, cmap="viridis", interpolation="nearest")
+    plt.colorbar(cax, label="Dissimilarity")
 
     # Annotate each cell with its value
     for i in range(rdm.shape[0]):
@@ -153,24 +154,23 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
         add_images_to_axes(ax, class_images, ticks, axis="y")  # Add images to y-axis
 
     # Configure tick positions and hide text labels
-    ax.set_xticks(np.arange(len(class_images)))
-    ax.set_yticks(np.arange(len(class_images)))
+    ax.set_xticks(np.arange(num_images))
+    ax.set_yticks(np.arange(num_images))
     ax.tick_params(axis="x", labelbottom=False, bottom=False)
     ax.tick_params(axis="y", labelleft=False, left=False)
 
-    # # Set axis labels
-    # if class_labels:
-    #     plt.xticks(ticks=np.arange(len(class_labels)), labels=class_labels, rotation=90, fontsize=8)
-    #     plt.yticks(ticks=np.arange(len(class_labels)), labels=class_labels, fontsize=8)
-    # else:
-    #     plt.xticks(fontsize=8)
-    #     plt.yticks(fontsize=8)
+    # # Set axis limits to prevent image cutoff
+    # ax.set_xlim(-0.9, num_images - 0.9)
+    # ax.set_ylim(num_images - 0.9, -0.9)
 
     plt.title(f"RDM - {model_name} - {layer_name}", fontsize=12)
-    output_dir = "./output7/rdm_heatmaps_FabianModel/"
+
+    # Save figure
+    output_dir = "./RDMs_FabianModel/output1/"
     os.makedirs(output_dir, exist_ok=True)
     plt.savefig(f"{output_dir}/{model_name}_{layer_name}.png")
     plt.close()
+
 
 
 
