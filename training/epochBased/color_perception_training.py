@@ -5,13 +5,11 @@ import torch.nn as nn
 import torch.optim as optim
 from datasets import load_dataset
 
-from src.dataloader import create_curriculum_dataloaders
-from src.dataloader import create_no_curriculum_dataloader
+from src.dataloader import create_color_dataloader, create_no_curriculum_dataloader
 from training.train import train_model
 from training.utils import plot_learning_curves
 from models.resnet18Sohan import get_model
 from config import AGES, EPOCHS, BATCH_SIZE, LEARNING_RATE, NUM_CLASSES, DEVICE, MODELS
-
 
 # 1. Load Tiny ImageNet Data
 def load_tiny_imagenet_data(split="train"):
@@ -19,7 +17,7 @@ def load_tiny_imagenet_data(split="train"):
     return data[split]
 
 # 2. Curriculum Training with Flexible Epoch Allocation
-def train_and_save_model_curriculum(model,
+def train_and_save_color_perception_model(model,
                                     curriculum_dataloaders,
                                     val_dataloader,
                                     ages,
@@ -49,7 +47,7 @@ def train_and_save_model_curriculum(model,
 
     # Loop through each age stage in the order given by `ages`
     for age in ages:
-        stage_name = f"Curriculum_Age_{age}mo_{model_name}"
+        stage_name = f"color_perception_Age_{age}mo_{model_name}"
         dataloader = curriculum_dataloaders[age]
         epochs_for_this_stage = stage_epochs[age]
 
@@ -75,15 +73,15 @@ def train_and_save_model_curriculum(model,
     )
 
     # Save the final model
-    torch.save(model.state_dict(), os.path.join(model_output_dir, f"{model_name}_curriculum_final.pth"))
+    torch.save(model.state_dict(), os.path.join(model_output_dir, f"{model_name}_color_perception_final.pth"))
 
     # Save the train/val losses to JSON
-    loss_file = f"{model_name}_curriculum_losses.json"
+    loss_file = f"{model_name}_color_perception_losses.json"
     with open(os.path.join(loss_output_dir, loss_file), "w") as f:
         json.dump({"train_losses": overall_train_losses, "val_losses": overall_val_losses}, f)
 
     # Plot learning curves for the entire curriculum
-    final_stage_name = f"CurriculumLearning_{model_name}"
+    final_stage_name = f"ColorPerception_{model_name}"
     plot_learning_curves(overall_train_losses, overall_val_losses, final_stage_name)
 
     return overall_train_losses, overall_val_losses
@@ -122,7 +120,7 @@ def create_stage_epoch_mapping(ages, total_epochs, user_mapping=None):
         return stage_epoch_map
 
 # 4. Main Training Loop (Curriculum)
-def train_curriculum(batch_size,
+def train_color_perception(batch_size,
                      total_epochs,
                      learning_rate,
                      num_classes,
@@ -133,7 +131,7 @@ def train_curriculum(batch_size,
                      user_epoch_map=None):
     """
     - Loads Tiny ImageNet training and validation data.
-    - Creates dataloaders with age-based transforms (curriculum).
+    - Creates dataloaders with age-based transforms (color perception).
     - Creates and trains multiple models with the total epochs distributed
       according to a user-provided or default scheme.
     """
@@ -142,7 +140,7 @@ def train_curriculum(batch_size,
     val_data = load_tiny_imagenet_data(split="valid")
 
     # 4.2 Create curriculum DataLoaders (one DataLoader per age)
-    curriculum_dataloaders = create_curriculum_dataloaders(
+    curriculum_dataloaders = create_color_dataloader(
         dataset=train_data,
         ages=ages,
         batch_size=batch_size
@@ -173,7 +171,7 @@ def train_curriculum(batch_size,
         )
 
         # Train and save model
-        train_and_save_model_curriculum(
+        train_and_save_color_perception_model(
             model=model,
             curriculum_dataloaders=curriculum_dataloaders,
             val_dataloader=val_dataloader,
@@ -188,6 +186,7 @@ def train_curriculum(batch_size,
             model_name=model_name
         )
 
+
 # 5. Example Entry Point
 def main():
     # Hyperparameters
@@ -201,14 +200,14 @@ def main():
 
 
     # Output folders
-    model_output_dir = "output/models/curriculum/"
-    loss_output_dir = "output/loss_logs/curriculum/"
+    model_output_dir = "output/models/color_perception/"
+    loss_output_dir = "output/loss_logs/color_perception/"
 
     # User-provided epoch distribution (optional)
     user_epoch_map = None  # Example: {6: 2, 9: 5, 12: 8}
 
     # Start training with curriculum for all models
-    train_curriculum(
+    train_color_perception(
         batch_size=batch_size,
         total_epochs=total_epochs,
         learning_rate=learning_rate,
@@ -222,3 +221,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
