@@ -5,7 +5,8 @@ from datasets import load_dataset  # For loading Tiny ImageNet dataset
 import random  # For selecting random images
 from torchvision import transforms
 import json  # For saving results
-from brainscore_core.benchmarks import benchmark_pool, score_model  # For Brainscore integration
+from brainscore_vision.benchmarks import public_benchmark_pool
+from brainscore_core.benchmarks import score_model  # For Brainscore integration
 from brainscore_core.model_interface import BrainModel
 
 # Define the folder where your models are located
@@ -82,7 +83,7 @@ for model_file in MODEL_FILES:
 
     # Evaluate the model on Brainscore benchmarks
     print(f"Evaluating {model_file} on Brainscore benchmarks...")
-    for benchmark_name, benchmark in benchmark_pool.items():
+    for benchmark_name, benchmark in public_benchmark_pool.items():
         try:
             score = score_model(model_identifier, brain_model, benchmark=benchmark)
 
