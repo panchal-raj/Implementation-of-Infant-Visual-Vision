@@ -10,10 +10,18 @@ from datasets import load_dataset
 import random
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
-from config import MODEL_PATHS
+# from config import MODEL_PATHS
 
-# Paths to the models
-MODEL_PATHS = MODEL_PATHS #refer config.py for path files 
+# # Paths to the models
+# MODEL_PATHS = MODEL_PATHS #refer config.py for path files 
+
+MODEL_PATHS = {
+    "visual_acuity": "./weights/FabianResNet/resnet18_tinyimagenet_acuity.pth",
+    "contrast_adjust": "./weights/FabianResNet/resnet18_tinyimagenet_contrast.pth",
+    "both_transforms": "./weights/FabianResNet/resnet18_tinyimagenet_both.pth",
+    "no_transforms": "./weights/FabianResNet/resnet18_tinyimagenet_default.pth"
+}
+
 
 # Load Tiny ImageNet validation set
 def load_tiny_imagenet_data(split="valid"):
@@ -116,7 +124,7 @@ def add_images_to_axes(ax, images, positions, axis="x"):
 
         if axis == "x":
             ab = AnnotationBbox(imagebox, (pos, -0.5), frameon=False,
-                                box_alignment=(0.5, 1), xycoords="data")  # Adjust y position
+                                box_alignment=(0.5, 0), xycoords="data")  # Adjust y position
         else:
             ab = AnnotationBbox(imagebox, (-0.5, pos), frameon=False,
                                 box_alignment=(1, 0.5), xycoords="data")  # Adjust x position
@@ -135,9 +143,15 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
         model_name (str): The name of the model.
         class_images (list, optional): List of images (PIL or numpy arrays) for the axes.
     """
+    plt.title(f"RDM - {model_name} - {layer_name}", fontsize=12)
+
+    
     num_images = rdm.shape[0]  # Number of images
     fig, ax = plt.subplots(figsize=(10, 10))  # Adjust figure size for clarity
 
+    
+    
+    
     # Plot the heatmap
     cax = ax.imshow(rdm, cmap="viridis", interpolation="nearest")
     plt.colorbar(cax, label="Dissimilarity")
@@ -163,13 +177,17 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
     # ax.set_xlim(-0.9, num_images - 0.9)
     # ax.set_ylim(num_images - 0.9, -0.9)
 
-    plt.title(f"RDM - {model_name} - {layer_name}", fontsize=12)
+    
 
     # Save figure
-    output_dir = "./RDMs_FabianModel/output1/"
+    output_dir = "./RDMs_FabianModel/output2/"
     os.makedirs(output_dir, exist_ok=True)
     plt.savefig(f"{output_dir}/{model_name}_{layer_name}.png")
     plt.close()
+
+    # Save RDM as a .npy file
+    os.makedirs("./output/rdm/resent_model/", exist_ok=True)
+    np.save(f"./output/rdm/resent_model/{model_name}_{layer_name}_rdm.npy", rdm)
 
 
 
@@ -217,6 +235,9 @@ def main():
         for layer_name in layers_to_compare:
             rdm = calculate_rdm(model_features[layer_name] - baseline_features[layer_name])
             save_rdm_heatmap(rdm, layer_name, model_name, class_images)
+
+
+
 
 if __name__ == "__main__":
     main()
