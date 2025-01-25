@@ -5,22 +5,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torchvision.transforms import Compose, Resize, ToTensor
 
-from models.FabianModel import get_model
-# from models.resnet18Sohan import get_model
-# from models.layerWiseResNet18 import get_model
-
 from scipy.spatial.distance import pdist, squareform
 from datasets import load_dataset
 import random
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
+# from config import MODEL_PATHS
 
-from config import MODEL_PATHS1, MODEL_PATHS2
+from models.FabianModel import get_model
+#from models.resnet18Sohan import get_model
+
 
 # # Paths to the models
 # MODEL_PATHS = MODEL_PATHS #refer config.py for path files 
 
-MODEL_PATHS = MODEL_PATHS1
+MODEL_PATHS = {
+    "visual_acuity": "./weights/SohanResNet/resnet18_visual_acuity_final.pth",
+    "color_adjust": "./weights/SohanResNet/resnet18_color_perception_final.pth",
+    "both_transforms": "./weights/SohanResNet/resnet18_curriculum_final.pth",
+    "no_transformation": "./weights/SohanResNet/resnet18_no_curriculum_final.pth"
+}
 
 
 # Load Tiny ImageNet validation set
@@ -135,13 +139,13 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
     plt.title(f"RDM - {model_name} - {layer_name}", fontsize=18)
     
     # Save figure
-    output_dir = "./RDMs_Figure/2.FabianResNet/no_transforms"
+    output_dir = "./RDMs_Figure/2.SohanResNet/no_transforms"
     os.makedirs(output_dir, exist_ok=True)
     plt.savefig(f"{output_dir}/{model_name}_{layer_name}.png", dpi=300, bbox_inches="tight")
     plt.close()
 
     # Save RDM as a .npy file
-    output_dir2 = "./RDMs_npyFormat/2.FabianResNet/no_transforms"
+    output_dir2 = "./RDMs_npyFormat/2.SohanResNet/no_transforms"
     os.makedirs(output_dir2, exist_ok=True)
     np.save(f"{output_dir2}/{model_name}_{layer_name}_rdm.npy", rdm)
 
