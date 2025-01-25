@@ -1,6 +1,6 @@
 import torch
 import logging
-from setting import DEVICE
+from config import DEVICE
 
 # Configure logging
 logging.basicConfig(
