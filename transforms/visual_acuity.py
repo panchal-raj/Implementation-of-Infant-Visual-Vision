@@ -1,7 +1,6 @@
 from PIL import ImageFilter
 import math
 
-
 class VisualAcuityTransform:
     def __init__(self, age_in_months):
         self.age_in_months = age_in_months

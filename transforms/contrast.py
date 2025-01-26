@@ -5,10 +5,11 @@ class ContrastTransform:
         self.age_in_months = age_in_months
 
     def __call__(self, img):
-        if self.age_in_months < 2:
-            contrast_factor = 0.2
-        else:
-            # Gradual increase after 2 months
-            age_in_weeks = self.age_in_months * (365.25 / 12) / 7
-            contrast_factor = max(0.2, min(age_in_weeks / 52, 1.0))
+        # Convert age in months to age in weeks
+        age_in_weeks = self.age_in_months * (365.25 / 12) / 7
+
+        # Calculate contrast factor (develops fully by 12 months)
+        contrast_factor = min(age_in_weeks / 52, 1.0) if self.age_in_months <= 12 else 1.0
+
+        # Apply contrast adjustment
         return F.adjust_contrast(img, contrast_factor)

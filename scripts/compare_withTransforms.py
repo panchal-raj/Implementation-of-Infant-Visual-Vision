@@ -5,26 +5,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torchvision.transforms import Compose, Resize, ToTensor
 
+# Fabian Model
+#from models.FabianModel import get_model  
+
+# Sohan Model  
+# from models.resnet18Sohan import get_model
+
+# Layer-Wise ResNet18
+from models.layerWiseResNet18 import get_model
+
 from scipy.spatial.distance import pdist, squareform
 from datasets import load_dataset
 import random
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
-# from config import MODEL_PATHS
 
-from models.FabianModel import get_model
-#from models.resnet18Sohan import get_model
+from config import MODEL_PATHS1, MODEL_PATHS2
+
+
+# Import the transformations
+from transforms.visual_acuity import VisualAcuityTransform
+from transforms.contrast import ContrastTransform
+from transforms.color_perception import ColorPerceptionTransform
 
 
 # # Paths to the models
-# MODEL_PATHS = MODEL_PATHS #refer config.py for path files 
-
-MODEL_PATHS = {
-    "visual_acuity": "./weights/SohanResNet/resnet18_visual_acuity_final.pth",
-    "color_adjust": "./weights/SohanResNet/resnet18_color_perception_final.pth",
-    "both_transforms": "./weights/SohanResNet/resnet18_curriculum_final.pth",
-    "no_transformation": "./weights/SohanResNet/resnet18_no_curriculum_final.pth"
-}
+MODEL_PATHS = MODEL_PATHS2 #refer config.py for path files 
 
 
 # Load Tiny ImageNet validation set
@@ -51,15 +57,38 @@ def sample_random_images(data, num_samples=100):
     return [data[i] for i in sampled_indices]
 
 # Transformation pipeline for Tiny ImageNet images
-def no_transform():
+def get_transformation_pipeline():
     """
-    Ensure all images are resized to (64, 64) and converted to 3-channel RGB.
+    Returns a function that applies the correct transformation based on image index.
+    Ensures:
+      - First 20 images: No transformation
+      - Next 20 images: Visual acuity blur
+      - Next 20 images: Contrast adjustment
+      - Next 20 images: Color perception adjustment
+      - Last 20 images: Combination of all three
     """
-    return Compose([
-        Resize((64, 64)), 
-        lambda img: img.convert("RGB"),  # Ensure RGB mode (3 channels)
-        ToTensor()
-    ])
+    def transform_image(img, index):
+        # Resize and convert image to RGB format
+        img = img.resize((64, 64)).convert("RGB")
+
+        if 0 <= index < 20:
+            return img  # No transformation
+        elif 20 <= index < 40:
+            return VisualAcuityTransform(3)(img)  # Apply visual acuity blur
+        elif 40 <= index < 60:
+            return ContrastTransform(3)(img)  # Apply contrast transformation
+        elif 60 <= index < 80:
+            return ColorPerceptionTransform(3)(img)  # Apply color perception transformation
+        elif 80 <= index < 100:
+            img = VisualAcuityTransform(3)(img)
+            img = ContrastTransform(3)(img)
+            img = ColorPerceptionTransform(3)(img)
+            return img  # Apply all transformations
+        else:
+            raise ValueError("Index out of range. Expected index between 0 and 99.")
+
+    return lambda img, idx: ToTensor()(transform_image(img, idx))
+
 
 # Load the model from a given path
 def load_model(model_path, num_classes=200):
@@ -110,11 +139,10 @@ def calculate_rdm(feature_map):
     distances = pdist(flattened, metric="correlation")  # Compute pairwise correlation distances
     return squareform(distances)  # Convert to square matrix
 
-
 # Save the RDM as a heatmap image and .npy format
 def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
     """
-    Save and display an enhanced RDM heatmap.
+    Save and display an enhanced RDM heatmap with clear transformation labels and separation lines.
 
     Args:
         rdm (ndarray): The RDM matrix to visualize.
@@ -124,28 +152,47 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
     """
     num_images = rdm.shape[0]  # Number of images
 
-    # Increased figure size for better visibility
+    # Define tick positions and labels
+    tick_positions = [0, 20, 40, 60, 80, 99]  # Show only these major ticks
+    tick_labels = ["0", "20", "40", "60", "80", "99"]
+
+    # Define transformation group positions (center of each block)
+    group_positions = [10, 30, 50, 70, 90]  
+    group_labels = ["No Transform", "Blur", "Contrast", "Color", "All Transforms"]
+
     fig, ax = plt.subplots(figsize=(20, 20))  
 
-    # Plot the heatmap with better settings
+    # Plot the heatmap
     cax = ax.imshow(rdm, cmap="viridis", interpolation="none")  
     cbar = plt.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("Dissimilarity", fontsize=14)
 
-    # Set ticks for all images
-    # ax.set_xticks(np.arange(num_images))
-    ax.set_yticks(np.arange(num_images))
+    # Set tick labels for number of images
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels(tick_labels, fontsize=14)
+    ax.set_yticks(tick_positions)
+    ax.set_yticklabels(tick_labels, fontsize=14)
 
-    plt.title(f"RDM - {model_name} - {layer_name}", fontsize=18)
-    
+    # Set transformation labels at the center of each group
+    for pos, label in zip(group_positions, group_labels):
+        ax.text(pos, num_images + 3, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black")  # X-axis labels
+        ax.text(-8, pos, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black", rotation=90)  # Y-axis labels
+
+    # Add separation lines between transformation groups
+    for pos in [20, 40, 60, 80]:  # Avoid line at 0 and 99
+        ax.axhline(pos - 0.5, color='white', linestyle='--', linewidth=2)
+        ax.axvline(pos - 0.5, color='white', linestyle='--', linewidth=2)
+
+    plt.title(f"RDM - {model_name} - {layer_name}\n(Images grouped by transformation type)", fontsize=18)
+
     # Save figure
-    output_dir = "./RDMs_Figure/2.SohanResNet/no_transforms"
+    output_dir = "./RDMs_Figure/1.LayerWiseResNet18/with_transforms"
     os.makedirs(output_dir, exist_ok=True)
     plt.savefig(f"{output_dir}/{model_name}_{layer_name}.png", dpi=300, bbox_inches="tight")
     plt.close()
 
     # Save RDM as a .npy file
-    output_dir2 = "./RDMs_npyFormat/2.SohanResNet/no_transforms"
+    output_dir2 = "./RDMs_npyFormat/1.LayerWiseResNet18/with_transforms"
     os.makedirs(output_dir2, exist_ok=True)
     np.save(f"{output_dir2}/{model_name}_{layer_name}_rdm.npy", rdm)
 
@@ -166,9 +213,11 @@ def main():
     # class_images = [Image.open(img["image"]).resize((64, 64)) for img in sampled_images]
     class_images = [img["image"].resize((64, 64)) if isinstance(img["image"], Image.Image) else Image.open(img["image"]).resize((64, 64))
                     for img in sampled_images]
+    
     # Apply the transformation pipeline to images
-    transform_pipeline = no_transform()
-    transformed_images = torch.stack([transform_pipeline(img["image"]) for img in sampled_images])
+    transform_pipeline = get_transformation_pipeline()
+    # Apply transformations while ensuring the order
+    transformed_images = torch.stack([transform_pipeline(img["image"], i) for i, img in enumerate(sampled_images)])
 
     # Load all models
     models = {name: load_model(path) for name, path in MODEL_PATHS.items()}
