@@ -1,9 +1,4 @@
-import sys
-import os
-import torch
-import matplotlib.pyplot as plt
-import numpy as np
-from torchvision.transforms import Compose, Resize, ToTensor
+from imports import *
 
 # Fabian Model
 #from models.FabianModel import get_model  
@@ -13,15 +8,6 @@ from torchvision.transforms import Compose, Resize, ToTensor
 
 # Layer-Wise ResNet18
 from models.layerWiseResNet18 import get_model
-
-from scipy.spatial.distance import pdist, squareform
-from datasets import load_dataset
-import random
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from PIL import Image
-
-from config import MODEL_PATHS1, MODEL_PATHS2
-
 
 # Import the transformations
 from transforms.visual_acuity import VisualAcuityTransform

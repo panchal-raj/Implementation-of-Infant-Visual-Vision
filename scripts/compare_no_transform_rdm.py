@@ -1,27 +1,6 @@
-import sys
-import os
-import torch
-import matplotlib.pyplot as plt
-import numpy as np
-from torchvision.transforms import Compose, Resize, ToTensor
+from imports import *
 from models.FabianModel import get_model
-from scipy.spatial.distance import pdist, squareform
-from datasets import load_dataset
-import random
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from PIL import Image
-# from config import MODEL_PATHS
-
-# # Paths to the models
-# MODEL_PATHS = MODEL_PATHS #refer config.py for path files 
-
-MODEL_PATHS = {
-    "visual_acuity": "./weights/FabianResNet/resnet18_tinyimagenet_acuity.pth",
-    "contrast_adjust": "./weights/FabianResNet/resnet18_tinyimagenet_contrast.pth",
-    "both_transforms": "./weights/FabianResNet/resnet18_tinyimagenet_both.pth",
-    "no_transforms": "./weights/FabianResNet/resnet18_tinyimagenet_default.pth"
-}
-
+MODEL_PATHS = MODEL_PATHS1 #Fabian Model 
 
 # Load Tiny ImageNet validation set
 def load_tiny_imagenet_data(split="valid"):
