@@ -22,7 +22,7 @@ def load_tiny_imagenet_data(split="valid"):
 val_data = load_tiny_imagenet_data()
 
 # Randomly sample 100 images from the validation set
-NUM_IMAGES = 100
+NUM_IMAGES = 10
 random.seed(42)  # Ensure reproducibility
 sampled_indices = random.sample(range(len(val_data)), NUM_IMAGES)
 sampled_images = val_data.select(sampled_indices)
