@@ -11,7 +11,6 @@ from models.layerWiseResNet18 import get_model
 
 # Import the transformations
 from transforms.visual_acuity import VisualAcuityTransform
-from transforms.contrast import ContrastTransform
 from transforms.color_perception import ColorPerceptionTransform
 
 
@@ -47,29 +46,25 @@ def get_transformation_pipeline():
     """
     Returns a function that applies the correct transformation based on image index.
     Ensures:
-      - First 20 images: No transformation
-      - Next 20 images: Visual acuity blur
-      - Next 20 images: Contrast adjustment
-      - Next 20 images: Color perception adjustment
-      - Last 20 images: Combination of all three
+      - First 25 images: No transformation
+      - Next 25 images: Visual acuity blur
+      - Next 25 images: Color perception adjustment
+      - Last 25 images: Combination of both
     """
     def transform_image(img, index):
         # Resize and convert image to RGB format
         img = img.resize((64, 64)).convert("RGB")
 
-        if 0 <= index < 20:
+        if 0 <= index < 25:
             return img  # No transformation
-        elif 20 <= index < 40:
+        elif 25 <= index < 50:
             return VisualAcuityTransform(3)(img)  # Apply visual acuity blur
-        elif 40 <= index < 60:
-            return ContrastTransform(3)(img)  # Apply contrast transformation
-        elif 60 <= index < 80:
+        elif 50 <= index < 75:
             return ColorPerceptionTransform(3)(img)  # Apply color perception transformation
-        elif 80 <= index < 100:
+        elif 75 <= index < 100:
             img = VisualAcuityTransform(3)(img)
-            img = ContrastTransform(3)(img)
             img = ColorPerceptionTransform(3)(img)
-            return img  # Apply all transformations
+            return img  # Apply both transformations
         else:
             raise ValueError("Index out of range. Expected index between 0 and 99.")
 
@@ -139,12 +134,13 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
     num_images = rdm.shape[0]  # Number of images
 
     # Define tick positions and labels
-    tick_positions = [0, 20, 40, 60, 80, 99]  # Show only these major ticks
-    tick_labels = ["0", "20", "40", "60", "80", "99"]
+    tick_positions = [0, 25, 50, 75, 99]  # Show only these major ticks
+    tick_labels = ["0", "25", "50", "75", "99"]
 
     # Define transformation group positions (center of each block)
-    group_positions = [10, 30, 50, 70, 90]  
-    group_labels = ["No Transform", "Blur", "Contrast", "Color", "All Transforms"]
+    group_positions = [12, 37, 62, 87]  # New center positions for 4x4 grid
+    group_labels = ["No Transform", "Acuity", "Color", "All Transforms"]  
+
 
     fig, ax = plt.subplots(figsize=(20, 20))  
 
@@ -159,13 +155,19 @@ def save_rdm_heatmap(rdm, layer_name, model_name, class_images=None):
     ax.set_yticks(tick_positions)
     ax.set_yticklabels(tick_labels, fontsize=14)
 
+    # # Set transformation labels at the center of each group
+    # for pos, label in zip(group_positions, group_labels):
+    #     ax.text(pos, num_images + 2, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black")  # X-axis labels
+    #     ax.text(-8, pos, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black", rotation=90)  # Y-axis labels
+
     # Set transformation labels at the center of each group
     for pos, label in zip(group_positions, group_labels):
-        ax.text(pos, num_images + 3, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black")  # X-axis labels
-        ax.text(-8, pos, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black", rotation=90)  # Y-axis labels
+        ax.text(pos, num_images + 1, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black")  # X-axis labels
+        ax.text(-3, pos, label, ha="center", va="center", fontsize=16, fontweight="bold", color="black", rotation=90)  # Y-axis labels
+
 
     # Add separation lines between transformation groups
-    for pos in [20, 40, 60, 80]:  # Avoid line at 0 and 99
+    for pos in [25, 50, 75]:  # Avoid line at 0 and 99
         ax.axhline(pos - 0.5, color='white', linestyle='--', linewidth=2)
         ax.axvline(pos - 0.5, color='white', linestyle='--', linewidth=2)
 

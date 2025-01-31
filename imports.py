@@ -13,5 +13,5 @@ from PIL import Image
 import h5py
 from mpl_toolkits.axes_grid1 import ImageGrid
 from models.layerWiseResNet18 import get_model  # Import your custom model --> Layer-Wise ResNet18
-from models.FabianModel import get_model
+# from models.FabianModel import get_model
 from config import MODEL_PATHS1, MODEL_PATHS2
