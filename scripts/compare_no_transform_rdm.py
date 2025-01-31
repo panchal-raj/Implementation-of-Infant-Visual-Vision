@@ -1,10 +1,9 @@
-import sys
 import os
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from torchvision.transforms import Compose, Resize, ToTensor
-from InfantVisualPerception.models.FabianModel import get_model
+from models.FabianModel import get_model
 from scipy.spatial.distance import pdist, squareform
 from datasets import load_dataset
 import random
