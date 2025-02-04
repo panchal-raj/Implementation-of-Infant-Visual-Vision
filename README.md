@@ -54,5 +54,5 @@ Representational Dissimilarity Matrices (RDMs) measure differences in feature re
 **Comparision of Neural Networks with Brain Data:**
 We evaluated our networks using the Neural Encoding Dataset (NED), which includes pre-generated fMRI responses from the Natural Scenes Dataset (NSD) across multiple brain regions of interest (ROIs) in different subjects.
 
-Details: [Reports/Task3](Reports/Task 3.pdf)
+Details: [Reports/Task3](Reports/Task3.pdf)
 
