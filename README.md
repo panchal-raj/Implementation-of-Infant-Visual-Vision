@@ -39,7 +39,7 @@ In this part of the project, we have applied image transformations, namely visua
 Curriculum learning, inspired by human education, gradually introduces tasks of increasing complexity or specificity, facilitating better learning progression. 
 By gradually introducing age-specific data, the model systematically learns developmental visual patterns across age groups.
 
-<img src="Task2\img\DevelopmentalCurriculum.png" width=900 height=400>
+<img src="Task2\img\DevelopmentalCurriculum.png" width=932 height=469>
 
 Details: Reports/Task2
 
