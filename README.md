@@ -5,8 +5,8 @@ This project is developed as a submission for the Computational Visual Perceptio
 ## Getting Started
 
 1. Clone the repository. Create a virtual env using the command `python3 -m venv /path/to/new/virtual/environment`.
-- Refer to the [documentation](https://docs.python.org/3/library/venv.html) for more details.
 2. Install the package using `setup.py`:
+  
    ```bash
    python setup.py install
    ```
