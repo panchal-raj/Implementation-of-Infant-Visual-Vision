@@ -13,7 +13,7 @@ This project is developed as a submission for the Computational Visual Perceptio
 
 ## Task1: Visual Transforms Implemented
 
-### 1.Visual Acuity
+### 1. Visual Acuity
 Visual acuity is the ability of the eye to discern fine details and distinguish objects clearly. 
 
 **Infant Visual Acuity:** Poor visual acuity in infants, due to retinal and cortical immaturity, might adaptively support cortical development for broad spatial analysis.
