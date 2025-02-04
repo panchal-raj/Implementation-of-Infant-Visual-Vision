@@ -29,7 +29,7 @@ Contrast sensitivity is the ability to detect differences in luminance or color 
 
 <img src="Task1\output_images\cs.png" width=750 height=180>
 
-Details: Reports/Task1
+*Details: [Reports/Task1](Reports/Task1.pdf)*
 
 ## Task2: Design of Curriculum Learning for Training
 In this part of the project, we have applied image transformations, namely visual acuity and contrast sensitivity, to the TinyImageNet dataset and have trained them on a CustomResNet18 model using curriculum learning.
@@ -41,7 +41,7 @@ By gradually introducing age-specific data, the model systematically learns deve
 
 <img src="Task2\img\DevelopmentalCurriculum.png" width=932 height=469>
 
-Details: Reports/Task2
+*Details: [Reports/Task2](Reports/Task2.pdf)*
 
 ## Task3: Evaluation of Neural Networks with RDMs and NED
 In Part 3, we evaluate trained artificial neural networks using Representational Dissimilarity Matrices (RDMs) and compare them to different regions of interest (ROIs) in the brain responsible for vision, utilizing the Neural Encoding Dataset (NED).
@@ -54,5 +54,5 @@ Representational Dissimilarity Matrices (RDMs) measure differences in feature re
 **Comparision of Neural Networks with Brain Data:**
 We evaluated our networks using the Neural Encoding Dataset (NED), which includes pre-generated fMRI responses from the Natural Scenes Dataset (NSD) across multiple brain regions of interest (ROIs) in different subjects.
 
-Details: [Reports/Task3](Reports/Task3.pdf)
+*Details: [Reports/Task3](Reports/Task3.pdf)*
 
