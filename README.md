@@ -18,7 +18,7 @@ Visual acuity is the ability of the eye to discern fine details and distinguish 
 
 **Infant Visual Acuity:** Poor visual acuity in infants, due to retinal and cortical immaturity, might adaptively support cortical development for broad spatial analysis.
 
-<img src="Task1\code\output_images\va.png" width=750 height=180>
+<img src="Task1\output_images\va.png" width=750 height=180>
 
 ### 2. Contrast Sensitivity
 Contrast sensitivity is the ability to detect differences in luminance or color between an object and its background, enabling the perception of edges, textures, and subtle variations in visual scenes.
@@ -27,7 +27,7 @@ Contrast sensitivity is the ability to detect differences in luminance or color 
 * Newborns have low contrast sensitivity due to immature retinal and neural development, making it hard to detect subtle differences in light and dark.
 * It improves rapidly in the first year as the visual system matures, with higher sensitivity to high-contrast patterns earlier than low-contrast details.
 
-<img src="Task1\code\output_images\cs.png" width=750 height=180>
+<img src="Task1\output_images\cs.png" width=750 height=180>
 
 ## Task2: Design of Curriculum Learning for Training
 In this part of the project, we have applied image transformations, namely visual acuity and contrast sensitivity, to the TinyImageNet dataset and have trained them on a CustomResNet18 model using curriculum learning.
