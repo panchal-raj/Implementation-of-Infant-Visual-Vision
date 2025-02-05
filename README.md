@@ -50,11 +50,17 @@ In Part 3, we evaluate trained artificial neural networks using Representational
 Representational Dissimilarity Matrices (RDMs) measure differences in feature representations across models or network layers by computing pairwise correlation distances.
 <table>
   <tr>
-    <td><img src="output/RDMs_Images/both_transforms_conv1.png" width="280" height="300"></td>
-    <td><img src="output/RDMs_Images/both_transforms_layer1.png" width="280" height="300"></td>
-    <td><img src="output/RDMs_Images/both_transforms_layer4.png" width="280" height="300"></td>
+    <th>both_transforms - conv1</th>
+    <th>both_transforms - layer1</th>
+    <th>both_transforms - layer4</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="output/RDMs_Images/both_transforms_conv1.png" width="280" height="300"></td>
+    <td align="center"><img src="output/RDMs_Images/both_transforms_layer1.png" width="280" height="300"></td>
+    <td align="center"><img src="output/RDMs_Images/both_transforms_layer4.png" width="280" height="300"></td>
   </tr>
 </table>
+
 
 **Comparision of Neural Networks with Brain Data:**
 We evaluated our networks using the Neural Encoding Dataset (NED), which includes pre-generated fMRI responses from the Natural Scenes Dataset (NSD) across multiple brain regions of interest (ROIs) in different subjects.
