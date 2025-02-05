@@ -50,9 +50,9 @@ In Part 3, we evaluate trained artificial neural networks using Representational
 Representational Dissimilarity Matrices (RDMs) measure differences in feature representations across models or network layers by computing pairwise correlation distances.
 <table>
   <tr>
-    <th>both_transforms - conv1</th>
-    <th>both_transforms - layer1</th>
-    <th>both_transforms - layer4</th>
+    <td align="center"><p style="font-size:12px;">both_transforms - conv1</p></td>
+    <td align="center"><p style="font-size:12px;">both_transforms - layer1</p></td>
+    <td align="center"><p style="font-size:12px;">both_transforms - layer4</p></td>
   </tr>
   <tr>
     <td align="center"><img src="output/RDMs_Images/both_transforms_conv1.png" width="280" height="300"></td>
@@ -60,6 +60,7 @@ Representational Dissimilarity Matrices (RDMs) measure differences in feature re
     <td align="center"><img src="output/RDMs_Images/both_transforms_layer4.png" width="280" height="300"></td>
   </tr>
 </table>
+
 
 
 **Comparision of Neural Networks with Brain Data:**
